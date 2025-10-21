@@ -1,0 +1,63 @@
+---
+title: "GSLC 1 Bayesian Data Analysis"
+output: html_document
+date: "2024-10-14"
+---
+
+## GSLC Bayesian Data Analysis - Miecel Alicia Angel J 2702327601
+
+#### AB Testing Example
+
+```{r}
+Y1 <- 4721  
+N1 <- 8     
+Y2 <- 5209  
+N2 <- 8     
+
+# Prior parameters
+alpha <- 1
+beta <- 1
+
+# Posterior parameters for lambda1 (regular UI)
+alpha1_post <- alpha + Y1
+beta1_post <- beta + N1
+
+# Posterior parameters for lambda2 (new UI)
+alpha2_post <- alpha + Y2
+beta2_post <- beta + N2
+
+# Monte Carlo simulation
+set.seed(123)
+num_samples <- 10000
+
+lambda1_samples <- rgamma(num_samples, shape = alpha1_post, rate = beta1_post)
+lambda2_samples <- rgamma(num_samples, shape = alpha2_post, rate = beta2_post)
+
+# Estimate probability that lambda2 > lambda1
+prob_lambda2_greater <- mean(lambda2_samples > lambda1_samples)
+
+# Print result
+cat("Probability that the new UI has a higher click rate:", prob_lambda2_greater, "\n")
+```
+
+#### Explanation:
+
+1.  We want to determine if the new user interface (UI) has a higher click rate than the regular one. Clicks follow a Poisson distribution with rate $\lambda$ , and we will assume an uninformative Gamma prior on the rate.
+
+2.  Poisson Likelihood:
+
+    For both UIs, clicks are Poisson distributed: Y_i $\sim \text{Poisson}(\lambda_i \cdot N_i)$ where $N_i$ is the time (in hours) and $Y_i$ is the number of clicks.
+
+    $\lambda_1$ for the regular UI, $\lambda_2$ for the new UI.
+
+3.  Gamma Prior:
+
+    Assume a Gamma prior $\lambda_i \sim \text{Gamma}(\alpha, \beta)$ for both rates with uninformative priors, say $\alpha = 1 , \beta = 1$ .
+
+4.  Posterior Distribution:
+
+    The posterior for each $\lambda_i$ will be Gamma distributed because the Gamma is conjugate to the Poisson. The posterior for $\lambda_1$ is $\text{Gamma}(\alpha + Y_1, \beta + N_1)$ .The posterior for $\lambda_2$ is $\text{Gamma}(\alpha + Y_2, \beta + N_2)$ .
+
+5.  Monte Carlo Simulation:
+
+    We will sample from the posterior distributions of $\lambda_1$ and $\lambda_2$ using Monte Carlo. Then, we will compute the probability that $\lambda_2$ \> $\lambda_1$ .
